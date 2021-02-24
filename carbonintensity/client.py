@@ -24,17 +24,25 @@ class Client:
             "https://api.carbonintensity.org.uk/regional/intensity/%s/fw24h/postcode/%s"
             % (from_time.strftime("%Y-%m-%dT%H:%MZ"), self.postcode)
         )
-        _LOGGER.debug("Request: %s" % request_url)
+        request_url_national = (
+            "https://api.carbonintensity.org.uk/intensity/%s/fw24h/"
+            % (from_time.strftime("%Y-%m-%dT%H:%MZ"))
+        )
+        _LOGGER.debug("Regional Request: %s" % request_url)
+        _LOGGER.debug("National Request: %s" % request_url_national)
         async with aiohttp.ClientSession() as session:
             async with session.get(request_url) as resp:
                 json_response = await resp.json()
-                return generate_response(json_response)
+            async with session.get(request_url_national) as resp:
+                json_response_national = await resp.json()            
+            return generate_response(json_response, json_response_national)
 
 
-def generate_response(json_response):
+def generate_response(json_response, json_response_national):
     periods = dict()
     response = {}
-    print(json_response)
+    _LOGGER.debug(json_response)
+    _LOGGER.debug(json_response_national)
     data = json_response["data"]["data"]
     postcode = json_response["data"]["postcode"]
     for period in data:
@@ -43,7 +51,7 @@ def generate_response(json_response):
             "to": period["to"],
             "index": period["intensity"]["index"],
         }
-
+    national_data = json_response_national["data"]
     minimum_key = min(periods.keys())
 
     response = {
@@ -56,6 +64,8 @@ def generate_response(json_response):
             ).replace(tzinfo=timezone.utc),
             "current_period_forecast": data[0]["intensity"]["forecast"],
             "current_period_index": data[0]["intensity"]["index"],
+            "current_period_national_forecast": national_data[0]["intensity"]["forecast"],
+            "current_period_national_index": national_data[0]["intensity"]["index"],
             "lowest_period_from": datetime.strptime(
                 periods[minimum_key]["from"], "%Y-%m-%dT%H:%MZ"
             ).replace(tzinfo=timezone.utc),
