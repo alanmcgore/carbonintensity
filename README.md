@@ -19,7 +19,7 @@ In addition it calculates when is the next 24 hours lowest level comparing value
 
 ## Example
 
-Retrieve regional information based on postcode `SW1` for the next 24 hours starting now:
+Retrieve regional and national information based on postcode `SW1` for the next 24 hours starting now:
 
 ```python
    client = Client("SW1")
@@ -36,12 +36,14 @@ An example of the function output can be found below:
    {
        "data":
         {
-              "current_period_from": "2020-05-20T10:00Z",
-              "current_period_to": "2020-05-20T10:30Z",
+              "current_period_from": "2020-05-20T10:00+00:00",
+              "current_period_to": "2020-05-20T10:30+00:00",
               "current_period_forecast":300,
               "current_period_index": "high",
-              "lowest_period_from":"2020-05-21T14:00Z",
-              "lowest_period_to":"2020-05-21T14:30Z",
+              "current_period_national_forecast":230,
+              "current_period_national_index": "moderate",
+              "lowest_period_from":"2020-05-21T14:00+00:00",
+              "lowest_period_to":"2020-05-21T14:30+00:00",
               "lowest_period_forecast": 168,
               "lowest_period_index": "moderate",
               "postcode": "SW1"
