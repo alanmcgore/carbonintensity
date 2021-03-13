@@ -8,7 +8,6 @@ _LOGGER = logging.getLogger(__name__)
 
 class Client:
     """Carbon Intensity API Client"""
-    date_format = "%Y-%m-%dT%H:%M+00:00"
 
     def __init__(self, postcode):
         self.postcode = postcode
@@ -40,6 +39,7 @@ class Client:
 
 
 def generate_response(json_response, json_response_national):
+    date_string_format = "%Y-%m-%dT%H:%M+00:00"
     periods = dict()
     response = {}
     _LOGGER.debug(json_response)
@@ -57,22 +57,16 @@ def generate_response(json_response, json_response_national):
 
     response = {
         "data": {
-            "current_period_from": datetime.strptime(
-                data[0]["from"], date_format
-            ).replace(tzinfo=timezone.utc),
-            "current_period_to": datetime.strptime(
-                data[0]["to"], date_format
-            ).replace(tzinfo=timezone.utc),
+            "current_period_from": datetime.fromisoformat(data[0]["from"].replace('Z','+00:00')),
+            "current_period_to": datetime.fromisoformat(data[0]["to"].replace('Z','+00:00')),
             "current_period_forecast": data[0]["intensity"]["forecast"],
             "current_period_index": data[0]["intensity"]["index"],
             "current_period_national_forecast": national_data[0]["intensity"]["forecast"],
             "current_period_national_index": national_data[0]["intensity"]["index"],
-            "lowest_period_from": datetime.strptime(
-                periods[minimum_key]["from"], date_format
-            ).replace(tzinfo=timezone.utc),
-            "lowest_period_to": datetime.strptime(
-                periods[minimum_key]["to"], date_format
-            ).replace(tzinfo=timezone.utc),
+            "lowest_period_from": datetime.fromisoformat(
+                periods[minimum_key]["from"].replace('Z','+00:00')),
+            "lowest_period_to": datetime.fromisoformat(
+                periods[minimum_key]["to"].replace('Z','+00:00')),
             "lowest_period_forecast": minimum_key,
             "lowest_period_index": periods[minimum_key]["index"],
             "unit": "gCO2/kWh",
