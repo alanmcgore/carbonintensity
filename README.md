@@ -70,7 +70,7 @@ python3 -m pip install -U carbonintensity-forked
 ## Licenses
 
 This work is based on the following:
-- [carbonintensity](https://github.com/jscruz/carbonintensity): See [License] (https://github.com/jscruz/carbonintensity/blob/master/LICENSE)
+- [carbonintensity](https://github.com/jscruz/carbonintensity): See [License](https://github.com/jscruz/carbonintensity/blob/master/LICENSE)
 - [sensor.carbon_intensity_uk](https://github.com/jfparis/sensor.carbon_intensity_uk)
 - [sampleclient](https://github.com/ludeeus/sampleclient): See [Original license](./licenses/sampleclient/LICENSE)
 - [Carbon Intensity API](https://carbonintensity.org.uk/): See [Terms and conditions](https://github.com/carbon-intensity/terms/)
