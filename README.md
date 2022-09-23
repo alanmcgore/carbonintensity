@@ -17,6 +17,8 @@ It uses `aiohttp` to communicate with the API asynchrnously. This decision has b
 
 In addition it calculates when is the next 24 hours lowest level comparing values of the CO2 forecast levels.
 
+This version also adds in a regional low carbon generation percentage, which is calculated as nuclear + wind + solar + biomass + hydro as well as the work by @jfparis to implement optimal windows/forecasts. 
+
 ## Example
 
 Retrieve regional and national information based on postcode `SW1` for the next 24 hours starting now:
@@ -42,10 +44,19 @@ An example of the function output can be found below:
               "current_period_index": "high",
               "current_period_national_forecast":230,
               "current_period_national_index": "moderate",
+              "current_low_carbon_percentage": 23,
               "lowest_period_from":"2020-05-21T14:00+00:00",
               "lowest_period_to":"2020-05-21T14:30+00:00",
               "lowest_period_forecast": 168,
               "lowest_period_index": "moderate",
+              "optimal_window_from" : "2020-05-20T10:00+00:00",
+              "optimal_window_to" : "2020-05-20T10:30+00:00",
+              "optimal_window_forecast" : 121,
+              "optimal_window_index" : "low",
+              "optimal_window_48_from" : "2020-05-20T10:00+00:00",
+              "optimal_window_48_to" : "2020-05-20T10:30+00:00",
+              "optimal_window_48_forecast" : 130,
+              "optimal_window_48_index" : "low"
               "postcode": "SW1"
         }
     }
