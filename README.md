@@ -69,7 +69,7 @@ python3 -m pip install -U carbonintensity-forked
 
 <!-- links start -->
 
-[maintained]: https://img.shields.io/maintenance/yes/2020.svg
+[maintained]: https://img.shields.io/maintenance/yes/2022.svg
 
 <!-- links end -->
 
