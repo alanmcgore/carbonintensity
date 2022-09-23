@@ -2,9 +2,32 @@
 from datetime import datetime, timezone
 import aiohttp
 import logging
+import numpy as np
 
 _LOGGER = logging.getLogger(__name__)
 
+INTENSITY = {
+    "very low" : 0,
+    "low" : 1,
+    "moderate": 2,
+    "high": 3,
+    "very high": 4,
+}
+
+INTENSITY_INDEXES = {
+    2021: [50, 140, 220, 330],
+    2022: [45, 130, 210, 310],
+    2023: [40, 120, 200, 290],
+    2024: [35, 110, 190, 270],
+    2025: [30, 100, 180, 250],
+    2026: [25, 90, 170, 230],
+    2027: [20, 80, 160, 210],
+    2028: [15, 70, 150, 190],
+    2029: [10, 60, 140, 170],
+    2030: [5, 50, 130, 150],
+}
+
+LOW_CARBON_SOURCES = ["biomass", "nuclear", "hydro", "solar", "wind"]
 
 class Client:
     """Carbon Intensity API Client"""
@@ -38,22 +61,98 @@ class Client:
             return generate_response(json_response, json_response_national)
 
 
+
+
+
 def generate_response(json_response, json_response_national):
     date_string_format = "%Y-%m-%dT%H:%M+00:00"
+    intensities = []
+    period_start = []
+    period_end = []
     periods = dict()
     response = {}
     _LOGGER.debug(json_response)
     _LOGGER.debug(json_response_national)
     data = json_response["data"]["data"]
     postcode = json_response["data"]["postcode"]
+
+    national_data = json_response_national["data"]
+    two_day_forecast = True
+    
+
+    current_intensity_index = INTENSITY_INDEXES[datetime.now().year]
+    def get_index(intensity):
+        if intensity < current_intensity_index[0]:
+            return "very low"
+        elif intensity < current_intensity_index[1]:
+            return "low"
+        elif intensity < current_intensity_index[2]:
+            return "moderate"
+        elif intensity < current_intensity_index[3]:
+            return "high"
+        else:
+            return "very high"
+
+     # sanitise input length
+    if datetime.strptime(data[0]["to"], "%Y-%m-%dT%H:%MZ").replace(tzinfo=timezone.utc) < datetime.utcnow().replace(tzinfo=timezone.utc):
+        data.pop(0)
+    if len(data) > 96:
+        data = data[0:96]
+    if len(data) < 48:
+        return {"error": "malformed data"}
+    if len(data) % 2 == 1:
+        data.pop(-1)
+    if len(data) < 56:
+        two_day_forecast = False
+
     for period in data:
         periods[period["intensity"]["forecast"]] = {
             "from": period["from"],
             "to": period["to"],
             "index": period["intensity"]["index"],
         }
-    national_data = json_response_national["data"]
+
+    for period in data:
+        period_start.append(datetime.strptime(
+                period["from"], "%Y-%m-%dT%H:%MZ"
+            ).replace(tzinfo=timezone.utc))
+        period_end.append(datetime.strptime(
+                period["to"], "%Y-%m-%dT%H:%MZ"
+            ).replace(tzinfo=timezone.utc))
+        intensities.append(period["intensity"]["forecast"])
+  
     minimum_key = min(periods.keys())
+    intensity_array = np.array(intensities)
+    hourly_intensities = np.convolve(intensity_array, np.ones(2)/2 , 'valid')[::2]
+
+    hours_start = period_start[::2]
+    hours_end = period_end[1::2]
+
+    average_intensity24h  = np.convolve(hourly_intensities[:24], np.ones(4)/4 , 'valid')
+    best24h = np.argmin(average_intensity24h)
+
+    if two_day_forecast:
+        average_intensity48h  = np.convolve(hourly_intensities[24:], np.ones(4)/4 , 'valid')
+        best48h = np.argmin(average_intensity48h)
+    else:
+        best48h = 0
+
+    hourly_forecast = []
+    for i in range(len(hours_start)):
+        hourly_forecast.append({
+            "from":      hours_start[i],
+            "to":        hours_end[i],
+            "intensity": hourly_intensities[i],
+            "index":     get_index(hourly_intensities[i]),
+            "optimal":   True if (hours_start[i]>=hours_start[best24h] and hours_end[i]<=hours_end[best24h+3]) or \
+                                 (two_day_forecast and hours_start[i]>=hours_start[best48h+24] and hours_end[i]<=hours_end[best48h+3+24]) else False,
+        })
+
+    low_carbon_percentage = 0
+    for i in data[0]["generationmix"]:
+        if i["fuel"] in LOW_CARBON_SOURCES:
+            low_carbon_percentage += i["perc"]
+     
 
     response = {
         "data": {
@@ -63,12 +162,21 @@ def generate_response(json_response, json_response_national):
             "current_period_index": data[0]["intensity"]["index"],
             "current_period_national_forecast": national_data[0]["intensity"]["forecast"],
             "current_period_national_index": national_data[0]["intensity"]["index"],
+            "current_low_carbon_percentage": low_carbon_percentage,
             "lowest_period_from": datetime.fromisoformat(
                 periods[minimum_key]["from"].replace('Z','+00:00')),
             "lowest_period_to": datetime.fromisoformat(
                 periods[minimum_key]["to"].replace('Z','+00:00')),
             "lowest_period_forecast": minimum_key,
             "lowest_period_index": periods[minimum_key]["index"],
+            "optimal_window_from" : hours_start[best24h],
+            "optimal_window_to" : hours_end[best24h+3],
+            "optimal_window_forecast" : average_intensity24h[best24h],
+            "optimal_window_index" : get_index(average_intensity24h[best24h]),
+            "optimal_window_48_from" : hours_start[best48h+24] if two_day_forecast else None,
+            "optimal_window_48_to" : hours_end[best48h+3+24] if two_day_forecast else None,
+            "optimal_window_48_forecast" : average_intensity48h[best48h] if two_day_forecast else None, # no need for +24 as we are reading from a reduced array
+            "optimal_window_48_index" : get_index(average_intensity48h[best48h]) if two_day_forecast else None,
             "unit": "gCO2/kWh",
             "postcode": postcode,
         }

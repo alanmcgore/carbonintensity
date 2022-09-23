@@ -19,3 +19,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+Additional code around optimal forecasts Copyright (c) 2021 Jean-François Paris 
+as part of project sensor.carbon_intensity_uk.
+
+Remainder of code Copyright (c) 2022 Alan Gore under identical terms as 
+outlined above. (MIT)
