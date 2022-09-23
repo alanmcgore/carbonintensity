@@ -67,6 +67,12 @@ An example of the function output can be found below:
 python3 -m pip install -U carbonintensity-forked
 ```
 
+<!-- links start -->
+
+[maintained]: https://img.shields.io/maintenance/yes/2020.svg
+
+<!-- links end -->
+
 ## Licenses
 
 This work is based on the following:
