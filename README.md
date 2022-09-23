@@ -3,7 +3,6 @@
 <!-- badges start -->
 
 [![Maintained][Maintained]](#)
-[![BuyMeCoffee][buymecoffeebadge]][buymecoffeelink]
 
 <!-- badges end -->
 
@@ -11,9 +10,9 @@ _Simple Carbon Intensity UK API Library_
 
 The purpose of this library is to retrieve information from [Carbon Intensity UK](https://carbonintensity.org.uk/)
 
-The client connects asynchrnously to the API for retrieving information about the current level of CO2 generating energy in the current period.
+The client connects asynchronously to the API, retrieving information about the current level of CO2 generating energy in the current period.
 
-It uses `aiohttp` to communicate with the API asynchrnously. This decision has been based mainly on the premise that the library will be used in the context of Home Assistant integration.
+It uses `aiohttp` to communicate with the API asynchronously. This decision has been based mainly on the premise that the library will be used in the context of Home Assistant integration.
 
 In addition it calculates when is the next 24 hours lowest level comparing values of the CO2 forecast levels.
 
@@ -65,19 +64,14 @@ An example of the function output can be found below:
 ## Install carbonintensity
 
 ```bash
-python3 -m pip install -U carbonintensity
+python3 -m pip install -U carbonintensity-forked
 ```
-
-<!-- links start -->
-
-[buymecoffeelink]:https://www.buymeacoffee.com/jscruz
-[buymecoffeebadge]: https://camo.githubusercontent.com/cd005dca0ef55d7725912ec03a936d3a7c8de5b5/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f6275792532306d6525323061253230636f666665652d646f6e6174652d79656c6c6f772e737667
-[maintained]: https://img.shields.io/maintenance/yes/2020.svg
-
-<!-- links end -->
 
 ## Licenses
 
 This work is based on the following:
+- [carbonintensity](https://github.com/jscruz/carbonintensity): See [License] (https://github.com/jscruz/carbonintensity/blob/master/LICENSE)
+- [sensor.carbon_intensity_uk](https://github.com/jfparis/sensor.carbon_intensity_uk)
 - [sampleclient](https://github.com/ludeeus/sampleclient): See [Original license](./licenses/sampleclient/LICENSE)
 - [Carbon Intensity API](https://carbonintensity.org.uk/): See [Terms and conditions](https://github.com/carbon-intensity/terms/)
+
