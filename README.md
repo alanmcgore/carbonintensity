@@ -55,7 +55,9 @@ An example of the function output can be found below:
               "optimal_window_48_from" : "2020-05-20T10:00+00:00",
               "optimal_window_48_to" : "2020-05-20T10:30+00:00",
               "optimal_window_48_forecast" : 130,
-              "optimal_window_48_index" : "low"
+              "optimal_window_48_index" : "low",
+              "unit": "gCO2/kWh",
+              "forecast": [{"from":"2020-05-20T10:00+00:00","to": "2020-05-20T11:00+00:00", "intensity": 162, "index": 0, "optimal": False}],
               "postcode": "SW1"
         }
     }

@@ -1,7 +1,7 @@
 """Client."""
 from datetime import datetime, timezone
-import aiohttp
 import logging
+import aiohttp
 import numpy as np
 
 _LOGGER = logging.getLogger(__name__)
@@ -38,9 +38,11 @@ class Client:
         _LOGGER.debug(str(self))
 
     def __str__(self):
-        return "{ postcode: %s, headers: %s }" % (self.postcode, self.headers)
+        return f"{{ postcode: {self.postcode}, headers: {self.headers} }}"
 
     async def async_get_data(self, from_time=None):
+        ''' Get's national and regional electric grid co2
+        intensity data from carbonintensity.org.uk '''
         if from_time is None:
             from_time = datetime.now()
         request_url = (
@@ -51,21 +53,17 @@ class Client:
             "https://api.carbonintensity.org.uk/intensity/%s/fw24h/"
             % (from_time.strftime("%Y-%m-%dT%H:%MZ"))
         )
-        _LOGGER.debug("Regional Request: %s" % request_url)
-        _LOGGER.debug("National Request: %s" % request_url_national)
+        _LOGGER.debug("Regional Request: %s", request_url)
+        _LOGGER.debug("National Request: %s", request_url_national)
         async with aiohttp.ClientSession() as session:
             async with session.get(request_url) as resp:
                 json_response = await resp.json()
             async with session.get(request_url_national) as resp:
-                json_response_national = await resp.json()            
+                json_response_national = await resp.json()         
             return generate_response(json_response, json_response_national)
 
-
-
-
-
 def generate_response(json_response, json_response_national):
-    date_string_format = "%Y-%m-%dT%H:%M+00:00"
+    ''' Generates JSON response containing processed intensity data '''
     intensities = []
     period_start = []
     period_end = []
@@ -78,7 +76,6 @@ def generate_response(json_response, json_response_national):
 
     national_data = json_response_national["data"]
     two_day_forecast = True
-    
 
     current_intensity_index = INTENSITY_INDEXES[datetime.now().year]
     def get_index(intensity):
@@ -120,7 +117,7 @@ def generate_response(json_response, json_response_national):
                 period["to"], "%Y-%m-%dT%H:%MZ"
             ).replace(tzinfo=timezone.utc))
         intensities.append(period["intensity"]["forecast"])
-  
+ 
     minimum_key = min(periods.keys())
     intensity_array = np.array(intensities)
     hourly_intensities = np.convolve(intensity_array, np.ones(2)/2 , 'valid')[::2]
@@ -138,21 +135,22 @@ def generate_response(json_response, json_response_national):
         best48h = 0
 
     hourly_forecast = []
-    for i in range(len(hours_start)):
+    for i, start_hour in enumerate(hours_start):
         hourly_forecast.append({
-            "from":      hours_start[i],
+            "from":      start_hour,
             "to":        hours_end[i],
             "intensity": hourly_intensities[i],
             "index":     get_index(hourly_intensities[i]),
-            "optimal":   True if (hours_start[i]>=hours_start[best24h] and hours_end[i]<=hours_end[best24h+3]) or \
-                                 (two_day_forecast and hours_start[i]>=hours_start[best48h+24] and hours_end[i]<=hours_end[best48h+3+24]) else False,
+            "optimal":   True if (start_hour>=hours_start[best24h] and hours_end[i]<=hours_end[best24h+3]) or \
+                                 (two_day_forecast and start_hour>=hours_start[best48h+24] 
+                                 and hours_end[i]<=hours_end[best48h+3+24]) else False,
         })
 
     low_carbon_percentage = 0
     for i in data[0]["generationmix"]:
         if i["fuel"] in LOW_CARBON_SOURCES:
             low_carbon_percentage += i["perc"]
-     
+    
 
     response = {
         "data": {
@@ -178,7 +176,8 @@ def generate_response(json_response, json_response_national):
             "optimal_window_48_forecast" : average_intensity48h[best48h] if two_day_forecast else None, # no need for +24 as we are reading from a reduced array
             "optimal_window_48_index" : get_index(average_intensity48h[best48h]) if two_day_forecast else None,
             "unit": "gCO2/kWh",
+            "forecast": hourly_forecast,
             "postcode": postcode,
-        }
+                    }
     }
     return response

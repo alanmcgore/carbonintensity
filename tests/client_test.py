@@ -37,8 +37,9 @@ def test_generate_response():
     assert data["current_low_carbon_percentage"] == 14.6
     assert data["optimal_window_forecast"] == 172
     assert data["optimal_window_index"] == "moderate"
-    assert data ["optimal_window_from"].strftime("%Y-%m-%dT%H:%M") == "2024-05-20T12:00"
-    assert data ["optimal_window_to"].strftime("%Y-%m-%dT%H:%M") == "2024-05-20T16:00"
+    assert data["optimal_window_from"].strftime("%Y-%m-%dT%H:%M") == "2024-05-20T12:00"
+    assert data["optimal_window_to"].strftime("%Y-%m-%dT%H:%M") == "2024-05-20T16:00"
+    assert data["forecast"][0]["optimal"] == False
     # TODO: Add further tests for optimal window 48 hour predictions, expand testset to cover this. 
 
 @pytest.mark.asyncio
@@ -51,12 +52,12 @@ async def test_request_data():
     assert isinstance(data["current_period_from"], date)
     assert isinstance(data["current_period_to"], date)
     assert isinstance(data["current_period_forecast"], int)
-    assert data["current_period_national_index"]  in ["moderate", "high", "low", "medium"]
+    assert data["current_period_national_index"]  in ["very high", "moderate", "high", "low", "medium"]
     assert isinstance(data["current_period_national_forecast"], int)
-    assert data["current_period_index"] in ["moderate", "high", "low", "medium"]
+    assert data["current_period_index"] in ["very high", "moderate", "high", "low", "medium"]
     assert isinstance(data["lowest_period_from"], date)
     assert isinstance(data["lowest_period_to"], date)
     assert isinstance(data["lowest_period_forecast"], int)
-    assert data["lowest_period_index"] in ["moderate", "high", "low", "medium"]
+    assert data["lowest_period_index"] in ["very high", "moderate", "high", "low", "medium"]
     assert data["postcode"] == "BH1"
-    assert isinstance(data["current_low_carbon_percentage"], int)
+    assert isinstance(data["current_low_carbon_percentage"], float)
