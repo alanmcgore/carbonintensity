@@ -29,7 +29,7 @@ INTENSITY_INDEXES = {
 
 LOW_CARBON_SOURCES = ["biomass", "nuclear", "hydro", "solar", "wind"]
 
-FOSSIL_FUEL_SOURCES = ["gas", "coal"]
+FOSSIL_FUEL_SOURCES = ["gas", "coal", "oil"]
 
 class Client:
     """Carbon Intensity API Client"""
@@ -48,7 +48,7 @@ class Client:
         if from_time is None:
             from_time = datetime.now()
         request_url = (
-            "https://api.carbonintensity.org.uk/regional/intensity/%s/fw24h/postcode/%s"
+            "https://api.carbonintensity.org.uk/regional/intensity/%s/fw48h/postcode/%s"
             % (from_time.strftime("%Y-%m-%dT%H:%MZ"), self.postcode)
         )
         request_url_national = (

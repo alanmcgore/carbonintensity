@@ -18,7 +18,7 @@ In addition it calculates when is the next 24 hours lowest level comparing value
 
 This version also adds in a regional low carbon generation percentage, which is calculated as nuclear + wind + solar + biomass + hydro as well as the work by @jfparis to implement optimal windows/forecasts. 
 
-.2 Adds a regional fossil fuel generation percentage which calculates as gas + coal generation from the current window. 
+.2 Adds a regional fossil fuel generation percentage which calculates as gas + coal generation from the current window. .3 Adds oil and calls 48h service. 
 ## Example
 
 Retrieve regional and national information based on postcode `SW1` for the next 24 hours starting now:
