@@ -29,6 +29,8 @@ INTENSITY_INDEXES = {
 
 LOW_CARBON_SOURCES = ["biomass", "nuclear", "hydro", "solar", "wind"]
 
+FOSSIL_FUEL_SOURCES = ["gas", "coal"]
+
 class Client:
     """Carbon Intensity API Client"""
 
@@ -147,9 +149,12 @@ def generate_response(json_response, json_response_national):
         })
 
     low_carbon_percentage = 0
+    fossil_fuel_percentage = 0
     for i in data[0]["generationmix"]:
         if i["fuel"] in LOW_CARBON_SOURCES:
             low_carbon_percentage += i["perc"]
+        if i["fuel"] in FOSSIL_FUEL_SOURCES:
+            fossil_fuel_percentage += i["perc"]
     
 
     response = {
@@ -161,6 +166,7 @@ def generate_response(json_response, json_response_national):
             "current_period_national_forecast": national_data[0]["intensity"]["forecast"],
             "current_period_national_index": national_data[0]["intensity"]["index"],
             "current_low_carbon_percentage": low_carbon_percentage,
+            "current_fossil_fuel_percentage": fossil_fuel_percentage,
             "lowest_period_from": datetime.fromisoformat(
                 periods[minimum_key]["from"].replace('Z','+00:00')),
             "lowest_period_to": datetime.fromisoformat(

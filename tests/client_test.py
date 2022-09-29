@@ -35,6 +35,7 @@ def test_generate_response():
     assert data["lowest_period_index"] == "moderate"
     assert data["postcode"] == "BH1"
     assert data["current_low_carbon_percentage"] == 14.6
+    assert data["current_fossil_fuel_percentage"] == 73.2
     assert data["optimal_window_forecast"] == 172
     assert data["optimal_window_index"] == "moderate"
     assert data["optimal_window_from"].strftime("%Y-%m-%dT%H:%M") == "2024-05-20T12:00"
@@ -61,3 +62,4 @@ async def test_request_data():
     assert data["lowest_period_index"] in ["very high", "moderate", "high", "low", "medium"]
     assert data["postcode"] == "BH1"
     assert isinstance(data["current_low_carbon_percentage"], float)
+    assert isinstance(data["current_fossil_fuel_percentage"], float)

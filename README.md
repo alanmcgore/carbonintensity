@@ -1,4 +1,4 @@
-# carbonintensity-forked
+# carbonintensityforked
 
 <!-- badges start -->
 
@@ -18,6 +18,7 @@ In addition it calculates when is the next 24 hours lowest level comparing value
 
 This version also adds in a regional low carbon generation percentage, which is calculated as nuclear + wind + solar + biomass + hydro as well as the work by @jfparis to implement optimal windows/forecasts. 
 
+.2 Adds a regional fossil fuel generation percentage which calculates as gas + coal generation from the current window. 
 ## Example
 
 Retrieve regional and national information based on postcode `SW1` for the next 24 hours starting now:
@@ -44,6 +45,7 @@ An example of the function output can be found below:
               "current_period_national_forecast":230,
               "current_period_national_index": "moderate",
               "current_low_carbon_percentage": 23,
+              "current_fossil_fuel_percentage": 65,
               "lowest_period_from":"2020-05-21T14:00+00:00",
               "lowest_period_to":"2020-05-21T14:30+00:00",
               "lowest_period_forecast": 168,

@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
     README = fh.read()
 setup(
     name="carbonintensityforked",
-    version="0.0.1",
+    version="0.0.2",
     author="Original work by Jorge Cruz-Lambert with additions by Jean-François Paris & Alan Gore",
     author_email="alanmcgore@gmail.com",
     description="Home Assistant Client library for Carbon Intensity API - Adds work by jfparis and alanmcgore to expose additional forecasts and percentage renewables",
